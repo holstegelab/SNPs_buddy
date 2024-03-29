@@ -32,3 +32,15 @@ def print_mutation_table(mutations):
 
 mutations = find_mutations(vcf_file)
 print_mutation_table(mutations)
+
+def print_mutation_table(mutations, output_file):
+    with open(output_file, 'w') as f:
+        f.write("Sample - Mutations\n")
+        for sample, mutations_list in mutations.items():
+            if mutations_list:
+                f.write(f"{sample} - {', '.join(mutations_list)}\n")
+            else:
+                f.write(f"{sample} - None\n")
+
+output_file = input("Please enter the path to the output file: ")
+print_mutation_table(mutations, output_file)
