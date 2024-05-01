@@ -30,28 +30,28 @@ level2_regions_diploid = get_regions(level2_range_diploid_only)
 parts = level2_regions_diploid
 
 rule all:
-    input: expand(pj('{gene}/FILTRED_{genotype_mode}_{glnexus_dir}_annotated.hg38_multianno.vcf'), gene=gene, genotype_mode=genotype_mode, glnexus_dir=gvcf_caller)
+    input: expand(pj('{gene}/FILTRED_{gene}'), gene=gene)
 
 
 rule extract_per_part:
-    input: pj('{genotype_mode}_{glnexus_dir}custom/ANNOTATED/{region}_annotated.hg38_multianno.vcf.gz')
-    output: temp(pj('{gene}/{region}_annotated.hg38_multianno.vcf.gz'))
+    input: pj('{region}_annotated.vcf.gz')
+    output: temp(pj('{gene}/{region}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     shell: """
             bcftool view -Oz -o {output}  --write-index --exclude-uncalled --threads 2 --include 'INFO/Gene.ensGene=="{gene}"' {input}
             """
 
 rule gather_parts:
-    input: expand(pj('{gene}/{genotype_mode}_{glnexus_dir}_{region}_annotated.hg38_multianno.vcf.gz'), region=parts, allow_missing=True)
-    output: pj('{gene}/{genotype_mode}_{glnexus_dir}_annotated.hg38_multianno.vcf')
+    input: expand(pj('{gene}/{region}_annotated.vcf.gz'), region=parts, allow_missing=True)
+    output: pj('{gene}/{gene}.vcf')
     conda: "envs/snp_buddies.yaml"
     shell: """
             bcftools concat --threads 2 -Ov -o {output} {input}
             """
 
 rule quality_check:
-    input: pj('{gene}/{genotype_mode}_{glnexus_dir}_annotated.hg38_multianno.vcf')
-    output: pj('{gene}/FILTRED_{genotype_mode}_{glnexus_dir}_annotated.hg38_multianno.vcf')
+    input: pj('{gene}/{gene}.vcf')
+    output: pj('{gene}/FILTRED_{gene}.vcf')
     conda: "envs/snp_buddies.yaml"
     shell: """
             bcftools view --write-index -Ov -o {output} --threads 2 --include 'QUAL>20 & FORMAT/DP>10' {input} 
