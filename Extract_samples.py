@@ -21,6 +21,8 @@ def find_mutations(vcf_file):
                 mutations[sample_id].append(record.ID)
 
     return mutations
+## get actual GT with ID, ref and alt allele for specific site/sample
+## filter sample-wise
 
 def print_mutation_table(mutations):
     print("Sample - Mutations")
