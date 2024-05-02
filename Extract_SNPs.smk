@@ -37,7 +37,7 @@ rule all:
 
 
 rule extract_per_part:
-    input: pj('{region}_annotated.vcf.gz')
+    input: pj('{region}.annotated.vcf.gz')
     output: temp(pj('{gene}/{region}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     shell: """
