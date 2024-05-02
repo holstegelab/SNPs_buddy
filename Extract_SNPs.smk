@@ -25,7 +25,7 @@ def get_regions(lrange):
 
     return res
 
-level2_range_diploid_only = [('A', 2,x,2) for x in range(0,100)] + \
+level2_range_diploid_only = [('A', 2,x,2) for x in range(0,99)] + \
                [('X', 1,x,2) for x in range(0,5)] + \
                [('Y', 1, x,2) for x in range(0,2)]
 
