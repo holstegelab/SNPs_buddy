@@ -41,7 +41,7 @@ rule extract_per_part:
     output: temp(pj('{gene}/{region}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     shell: """
-            bcftools view -Oz -o {output}  --write-index --exclude-uncalled --threads 2 --include 'INFO/Gene.ensGene=="{gene}"' {input}
+            bcftools view -Oz -o {output}  --exclude-uncalled --threads 2 --include 'INFO/Gene.ensGene=="{gene}"' {input}
             """
 
 rule gather_parts:
