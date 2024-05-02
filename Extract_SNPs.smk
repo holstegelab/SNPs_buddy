@@ -33,7 +33,7 @@ level2_regions_diploid = get_regions(level2_range_diploid_only)
 parts = level2_regions_diploid
 
 rule all:
-    input: expand(pj('{gene}/FILTRED_{gene}'), gene=gene)
+    input: expand(pj('{gene}/FILTRED_{gene}.vcf'), gene=gene)
 
 
 rule extract_per_part:
