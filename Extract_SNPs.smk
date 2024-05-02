@@ -57,7 +57,7 @@ rule quality_check:
     output: pj('{gene}/FILTRED_{gene}.vcf')
     conda: "envs/snp_buddies.yaml"
     shell: """
-            bcftools view --write-index -Ov -o {output} --threads 2 --include 'QUAL>20 & FORMAT/DP>10' {input} 
+            bcftools view -Ov -o {output} --threads 2 --include 'QUAL>20 & FORMAT/DP>10' {input} 
             
             bcftools stats {output} > {output}.stats
             """
