@@ -1,7 +1,10 @@
+import os
+
 gene = config.get('gene')
 genotype_mode = config.get("genotype_mode", "WES")
 gvcf_caller = config.get("caller", "BOTH")
 
+pj = os.path.join
 
 def get_regions(lrange):
     """Converts a region describer (tuple format) to a list of regions (string format).
