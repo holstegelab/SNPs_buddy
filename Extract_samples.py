@@ -40,9 +40,9 @@ def print_mutation_table(mutations, output_file):
         f.write("Sample - Mutations\n")
         for sample, mutations_list in mutations.items():
             if mutations_list:
-                f.write(f"{sample} - {', '.join(mutations_list)}\n")
+                f.write(f"{sample},{','.join(mutations_list)}\n")
             else:
-                f.write(f"{sample} - None\n")
+                f.write(f"{sample},None\n")
 
 output_file = input("Please enter the path to the output file: ")
 print_mutation_table(mutations, output_file)
