@@ -23,7 +23,7 @@ def find_mutations(vcf_file):
                     "chr": record.CHROM,
                     "ref": record.REF,
                     "alt": ','.join(map(str, record.ALT)),
-                    "GT": sample.gt_type,
+                    "GT": sample['GT'],
                     "AD": sample.data.AD,
                     "DP": sample.data.DP,
                     "GQ": sample.data.GQ
