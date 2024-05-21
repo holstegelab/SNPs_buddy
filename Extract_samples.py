@@ -16,33 +16,37 @@ def find_mutations(vcf_file):
             sample_id = sample.sample
             if sample_id not in mutations:
                 mutations[sample_id] = []
-
             if sample.gt_type in [1, 2]:  # het or homo mutations
-                mutations[sample_id].append(record.ID)
-
+                mutation = {
+                    "sample_ID": sample_id,
+                    "POS": record.POS,
+                    "chr": record.CHROM,
+                    "ref": record.REF,
+                    "alt": ','.join(map(str, record.ALT)),
+                    "GT": sample.gt_type,
+                    "AD": sample.data.AD,
+                    "DP": sample.data.DP,
+                    "GQ": sample.data.GQ
+                }
+                if mutation["DP"] >= 10 and mutation["GQ"] >= 20:
+                    mutations[sample_id].append(mutation)
     return mutations
-## get actual GT with ID, ref and alt allele for specific site/sample
-## filter sample-wise
-
-def print_mutation_table(mutations):
-    print("Sample - Mutations")
-    for sample, mutations_list in mutations.items():
-        if mutations_list:
-            print(f"{sample} - {', '.join(mutations_list)}")
-        else:
-            print(f"{sample} - None")
 
 mutations = find_mutations(vcf_file)
-print_mutation_table(mutations)
+# print_mutation_table(mutations)
 
 def print_mutation_table(mutations, output_file):
     with open(output_file, 'w') as f:
-        f.write("Sample - Mutations\n")
+        f.write("Sample\tChr\tPos\tRef\tAlt\tGT\tAD\n")
         for sample, mutations_list in mutations.items():
             if mutations_list:
-                f.write(f"{sample},{','.join(mutations_list)}\n")
+                for mutation in mutations_list:
+                    f.write(f"{sample}\t{mutation['chr']}\t{mutation['POS']}\t{mutation['ref']}\t{mutation['alt']}\t{mutation['GT']}\t{mutation['AD']}\n")
             else:
-                f.write(f"{sample},None\n")
+                f.write(f"{sample}\tNone\tNone\tNone\tNone\tNone\tNone\n")
+
+output_file = input("Please enter the path to the output TSV file: ")
+print_mutation_table(mutations, output_file)
 
 output_file = input("Please enter the path to the output file: ")
 print_mutation_table(mutations, output_file)
