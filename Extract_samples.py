@@ -47,6 +47,3 @@ def print_mutation_table(mutations, output_file):
 
 output_file = input("Please enter the path to the output TSV file: ")
 print_mutation_table(mutations, output_file)
-
-output_file = input("Please enter the path to the output file: ")
-print_mutation_table(mutations, output_file)
