@@ -4,6 +4,7 @@ from constants import *
 sample_names = config.get('sample_names')
 
 dir_name = config.get('dir_name', sample_names.split(',')[0])
+input_dir = config.get('input_dir', '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED')
 
 rule all:
     input: expand(pj('{dir_name}/{sample_name}.vcf'), sample_name=sample_names, dir_name=dir_name)

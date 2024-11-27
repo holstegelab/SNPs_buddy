@@ -4,7 +4,7 @@ from constants import *
 gene = config.get('gene')
 genotype_mode = config.get("genotype_mode", "WES")
 gvcf_caller = config.get("caller", "BOTH")
-
+input_dir = config.get('input_dir', '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED')
 
 rule all:
     input: expand(pj('{gene}/FILTRED_{gene}.vcf'), gene=gene)

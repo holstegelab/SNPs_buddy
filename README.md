@@ -7,6 +7,8 @@ To extract genes of interest from vcf files there is the snakemake file `Extract
 As the output of the pipeline, there are 99 files, and finding the right gene could be painful. 
 
 So here is a small script to help you with it.
+By defautl input dir is '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED', but you can change it in by passing `--config input_dir=MYNICEPATH` to snakemake command
+
 
 In constants.py you can find path to the directory with vcf  files 
 
