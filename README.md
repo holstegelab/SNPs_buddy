@@ -8,6 +8,8 @@ As the output of the pipeline, there are 99 files, and finding the right gene co
 
 So here is a small script to help you with it.
 
+In constants.py you can find path to the directory with vcf  files 
+
 ### Instruction
 
 
@@ -27,5 +29,18 @@ So here is a small script to help you with it.
 2. After that script will ask to print the path to the vcf file
         *NOTE: there is no "autotabulation" yet, so use the command `realpath MYNICEVCF.vcf`, copy it, and paste this path as input to Python script
 3. The output will be a table in the shell. The script will ask for an output file. Type a path to the output file.
+
+## Extract by sample_name
+To extract SNPs by sample name you can use the script `Sample_by_samplename.smk`
+usage:
+`snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Sample_by_samplename.smk --rerun-incomplete --conda-frontend conda --use-conda -c 2 --config sample_names=Sample1,Sample2,SampleN dir_name=MyFancyResults`
+
+To change core numbers change `-c 2` to actual core numbers
+
+use `--config sample_names` to pass all sample names that you want to insclude in output. Use comma-separated list without space.
+If there are more than 1 sample it's handy to pass a directory name for output with `--config dir_name=MyFancyResluts`
+If dir_name is not there output dir name will be name of 1st samplename.
+
+
 
 
