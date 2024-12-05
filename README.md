@@ -44,5 +44,6 @@ If there are more than 1 sample it's handy to pass a directory name for output w
 If dir_name is not there output dir name will be name of 1st samplename.
 
 
+snakemake --cluster "sbatch --cpus-per-task={threads}  --time={resources.time_min}" --jobs 10
 
 
