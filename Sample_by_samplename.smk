@@ -14,6 +14,7 @@ rule extract_sample_by_sample_name:
     output: temp(pj('{dir_name}/{parts}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     params: sn = sample_names
+    benchmark: pj('benchmarks/{dir_name}/{parts}_annotated.benchmark')
     threads: 4
     resources: n = 4,
                 mem_mb = 32000,
@@ -30,6 +31,7 @@ rule gather_vcfs:
     output: pj('{dir_name}/{sample_name}.vcf')
     conda: "envs/snp_buddies.yaml"
     threads: 2
+    benchmark: pj('benchmarks/{dir_name}/{sample_name}.benchmark')
     resources: n = 2,
                 mem_mb = 18096,
                 partition = 'normal',
