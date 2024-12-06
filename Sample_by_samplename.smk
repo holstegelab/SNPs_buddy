@@ -23,7 +23,7 @@ rule extract_sample_by_sample_name:
 
     shell:
         """
-        bcftools view --threads 2 -Oz -o {output}  -s "{params.sn}" {input}
+        bcftools view --threads {resources.n} -Oz -o {output}  -s "{params.sn}" {input}
         """
 
 rule gather_vcfs:
@@ -38,5 +38,5 @@ rule gather_vcfs:
                 time_min = 720
     shell:
         """
-        bcftools concat --threads 2 -Ov -o {output} {input}
+        bcftools concat --threads {resources.n} -Ov -o {output} {input}
         """
