@@ -14,11 +14,11 @@ rule extract_sample_by_sample_name:
     output: temp(pj('{dir_name}/{parts}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     params: sn = sample_names
-    threads: 2
-    resources: n = 2,
-                mem_mb = 8096,
-                partition = 'short',
-                time_min = 120
+    threads: 4
+    resources: n = 4,
+                mem_mb = 32000,
+                partition = 'normal',
+                time_min = 720
 
     shell:
         """
@@ -31,9 +31,9 @@ rule gather_vcfs:
     conda: "envs/snp_buddies.yaml"
     threads: 2
     resources: n = 2,
-                mem_mb = 8096,
-                partition = 'short',
-                time_min = 120
+                mem_mb = 18096,
+                partition = 'normal',
+                time_min = 720
     shell:
         """
         bcftools concat --threads 2 -Ov -o {output} {input}
