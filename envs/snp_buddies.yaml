@@ -9,5 +9,5 @@ dependencies:
 - htslib=1.17
 - pyvcf=0.6.8
 - python=3.11
-- snakemake=8.0.1
+- snakemake=7
 name: snp_buddies_env
