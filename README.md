@@ -44,7 +44,7 @@ If there are more than 1 sample it's handy to pass a directory name for output w
 If dir_name is not there output dir name will be name of 1st samplename.
 
 
-snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --use-conda --snakefile ~/Share/SNPs_buddy/Sample_by_samplename.smk
+snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile ~/Share/SNPs_buddy/Sample_by_samplename.smk
 
 
 
