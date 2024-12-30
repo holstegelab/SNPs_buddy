@@ -12,7 +12,7 @@ rule all:
 
 rule extract_per_part:
     input: pj(input_dir, '{parts}.annotated.vcf.gz')
-    output: temp(pj('{parts}/{region}_annotated.vcf.gz'))
+    output: temp(pj('{gene}/{parts}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
     resources: n = 2,
                 mem_mb = 8000,
@@ -23,7 +23,7 @@ rule extract_per_part:
             """
 
 rule gather_parts:
-    input: expand(pj('{gene}/{region}_annotated.vcf.gz'), region=parts, allow_missing=True)
+    input: expand(pj('{gene}/{parts}_annotated.vcf.gz'), parts=parts, allow_missing=True)
     output: pj('{gene}/{gene}.vcf')
     conda: "envs/snp_buddies.yaml"
     resources: n = 2,
