@@ -12,7 +12,7 @@ rule all:
 
 rule extract_per_part:
     input: pj(input_dir, '{parts}.annotated.vcf.gz')
-    output: temp(pj('{gene}/{parts}_annotated.vcf.gz'))
+    output: temp(ensure(pj('{gene}/{parts}_annotated.vcf.gz')), non_empty=True)
     conda: "envs/snp_buddies.yaml"
     benchmark: pj('{gene}/benchs/{parts}_extract.benchmark')
     resources: n = 2,
