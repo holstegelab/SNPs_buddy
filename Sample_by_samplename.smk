@@ -11,7 +11,7 @@ rule all:
 
 rule extract_sample_by_sample_name:
     input: pj(input_dir, '{parts}.annotated.vcf.gz')
-    output: temp(ensure(pj('{dir_name}/{parts}_annotated.vcf.gz')), non_empty=True)
+    output: temp(ensure(pj('{dir_name}/{parts}_annotated.vcf.gz'), non_empty=True))
     conda: "envs/snp_buddies.yaml"
     params: sn = sample_names
     benchmark: pj('{dir_name}/benchs/{parts}_annotated.benchmark')
