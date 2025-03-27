@@ -17,9 +17,9 @@ rule extract_sample_by_sample_name:
     benchmark: pj('{dir_name}/benchs/{parts}_annotated.benchmark')
     threads: 4
     resources: n = 4,
-                mem_mb = 32000,
+                mem_mb = 4000,
                 partition = 'normal',
-                time_min = 720
+                time_min = '00:59:00'
 
     shell:
         """
@@ -33,9 +33,9 @@ rule gather_vcfs:
     threads: 2
     benchmark: pj('{dir_name}/benchs/{sample_name}.benchmark')
     resources: n = 2,
-                mem_mb = 18096,
+                mem_mb = 2000,
                 partition = 'normal',
-                time_min = 720
+                time_min = '00:45:00'
     shell:
         """
         bcftools concat --threads {resources.n} -Ov -o {output} {input}

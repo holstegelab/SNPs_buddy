@@ -20,17 +20,22 @@ In constants.py you can find path to the directory with vcf  files
 1. clone code to the directory of choice `git clone https://github.com/holstegelab/SNPs_buddy.git` or find it on Spider `/project/holstegelab/Share/SNPs_buddy`
     If you want to update - run the command `git pull` from the directory with the code
 3. install conda environment `conda env create -f envs/snp_buddies.yaml` and activate it
-4. To run this code you have to move to a directory with vcf files. (/project/holstegelab/Share/NL_VUMC_batches1_9 for example)
-5. start snakemake script with command `snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 2 --config gene=MyFancyGene`. After -c you have to mention amount of cores that will be used. I recommend to run it on nodes and use all required amount of cores. It could be an interactive node or just use `srun` for example `srun -p normal -c 32 -t 12:0:0 snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 32 --config gene=MyFancyGene`
-6. You will get a directory with a genename and some vcf-files and stat files inside
+4. To run this code you have to move to a directory with vcf files. (`/project/holstegelab/Share/NL_VUMC_joint_calling_splitted` for example)
+5. (PREFFERED) method is to use `snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --config gene=MyFancyGene`
+In this case you'll request nodes automatically inside the script and you won't be bothered with the amount of cores
+
+6. (ALTernative old). You can request nodes manually. You can use `salloc` for interactive nodes or just use `srun` for example `srun -p normal -c 32 -t 12:0:0 snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 32 --config gene=MyFancyGene`
+If you are using intercative node - start snakemake script with command `snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 2 --config gene=MyFancyGene`
+ After -c you have to mention amount of cores that will be used. I recommend to use all required amount of cores. 
+7. You will get a directory with a genename and some vcf-files and stat files inside
 
 
 ## Check samples that have a SNPs
+0. Script will ask to print the path to the vcf file. Since python doesn't work good with relative paths, you have to provide the full path to the file. To check the real path for the vcf file you have to use the command `realpath MYNICEVCF.vcf` and copy the output. Then paste it as input to the script
 
 1.  To use this script type `python Extract_samples.py`
-2. After that script will ask to print the path to the vcf file
-        *NOTE: there is no "autotabulation" yet, so use the command `realpath MYNICEVCF.vcf`, copy it, and paste this path as input to Python script
-3. The output will be a table in the shell. The script will ask for an output file. Type a path to the output file.
+
+2. The output will be a table in the shell. The script will ask for an output file. Type a path to the output file.
 
 ## Extract by sample_name
 To extract SNPs by sample name you can use the script `Sample_by_samplename.smk`
