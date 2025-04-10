@@ -51,4 +51,23 @@ rule quality_check:
             bcftools stats {output} > {output}.stats
             """
 
+rule calculate_missigness:
+    input: pj('{gene}/FILTRED_{gene}.vcf')
+    output: pj('{gene}/FILTRED_{gene}.missigness.tsv')
+    conda: "envs/snp_buddies.yaml"
+    resources: n = 1,
+                mem_mb = 1000,
+                partition = 'normal',
+                time_min = '00:20:00'
+    shell:
+        """
+        bcftools query -f '%CHROM\t%POS[\t%DP]\n' {input} | awk 'BEGIN {{ OFS="\t" }}
+          NR==1 {{total_samples = NF - 2}}
+                 {{count=0
+                     for(i=3; i<=NF; i++) {{
+                         if($i != "." && $i < 10) count++}}
+                     percent = (count / total_samples) * 100
+                     printf "%s\t%s\t%d\t%.2f%%\n", $1, $2, count, percent
+                 }}' > {output}
+        """
 
