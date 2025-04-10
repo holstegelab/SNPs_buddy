@@ -7,7 +7,9 @@ gvcf_caller = config.get("caller", "BOTH")
 input_dir = config.get('input_dir', '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED')
 
 rule all:
-    input: expand(pj('{gene}/FILTRED_{gene}.vcf'), gene=gene)
+    input: expand(pj('{gene}/FILTRED_{gene}.vcf'), gene=gene),
+              expand(pj('{gene}/FILTRED_{gene}.missigness.tsv'), gene=gene),
+              expand(pj('{gene}/FILTRED_{gene}.vcf.stats'), gene=gene)
 
 
 rule extract_per_part:
