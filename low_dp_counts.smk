@@ -10,12 +10,15 @@ else:
     region_name = os.path.basename(region).split('.')[0]
 
 
+rule all:
+    input: expand("{region_name}.low_dp_counts.tsv", region_name = region_name)
+
 
 rule get_percentage:
     input:
         vcf = vcf_file
     output:
-        lambda wildcards: f"{region_name}.low_dp_counts.tsv"
+        "{region_name}.low_dp_counts.tsv"
     conda:
         "envs/snp_buddies.yaml"
     params:
