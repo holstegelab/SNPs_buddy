@@ -27,28 +27,28 @@ rule get_percentage:
         """
         if [ "{params.bed}" = "None" ]; then
             bcftools query -f '%CHROM\t%POS[\t%DP]\n' {input.vcf} | \
-            awk 'BEGIN { OFS="\\t" }
-                {
+            awk 'BEGIN {{ OFS="\\t" }}
+                {{
                     count = 0
                     if (NR == 1) total_samples = NF - 2
-                    for (i = 3; i <= NF; i++) {
+                    for (i = 3; i <= NF; i++) {{
                         if ($i != "." && $i < 10) count++
-                    }
+                    }}
                     percent = (count / total_samples) * 100
                     printf "%s\\t%s\\t%d\\t%.2f%%\\n", $1, $2, count, percent
-                }' > {output}
+                }}' > {output}
         else
             bcftools view {input.vcf} -R {params.bed} > tmp_filtered.vcf
             bcftools query -f '%CHROM\t%POS[\t%DP]\n' tmp_filtered.vcf | \
-            awk 'BEGIN { OFS="\\t" }
-                {
+            awk 'BEGIN {{ OFS="\\t" }}
+                {{
                     count = 0
                     if (NR == 1) total_samples = NF - 2
-                    for (i = 3; i <= NF; i++) {
+                    for (i = 3; i <= NF; i++) {{
                         if ($i != "." && $i < 10) count++
-                    }
+                    }}
                     percent = (count / total_samples) * 100
                     printf "%s\\t%s\\t%d\\t%.2f%%\\n", $1, $2, count, percent
-                }' > {output}
+                }}' > {output}
         fi
         """
