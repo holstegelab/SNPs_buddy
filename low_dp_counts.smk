@@ -38,7 +38,9 @@ rule get_percentage:
                     printf "%s\\t%s\\t%d\\t%.2f%%\\n", $1, $2, count, percent
                 }}' > {output}
         else
-            bcftools view {input.vcf} -R {params.bed} > tmp_filtered.vcf
+            bgzip --keep --force {input.vcf}
+            tabix -p vcf {input.vcf}.gz
+            bcftools view {input.vcf}.gz -R {params.bed} > tmp_filtered.vcf
             bcftools query -f '%CHROM\t%POS[\t%DP]\n' tmp_filtered.vcf | \
             awk 'BEGIN {{ OFS="\\t" }}
                 {{
