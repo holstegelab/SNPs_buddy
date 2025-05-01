@@ -2,7 +2,10 @@ import os
 
 vcf_file = config.get('vcf')
 region = config.get('region')
-region_name = region.split('.')[0]
+if region == "None":
+    region = vcf_file.split('/')[-1].split('.')[0]
+else:
+    region = region.split('/')[-1].split('.')[0]
 
 
 rule get_precentage:
