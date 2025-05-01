@@ -11,6 +11,7 @@ rule get_precentage:
     output: "{region_name}.low_dp_counts.tsv"
     conda: "envs/snp_buddies.yaml"
     params: bed = lambda wildcards, input: int(input.bed) if input.bed != "None" else 0
+    default_target: True
     shell:
         """
         if [{params.bed} == 0]
