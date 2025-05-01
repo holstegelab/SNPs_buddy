@@ -3,8 +3,10 @@ import os
 vcf_file = config.get('vcf')
 region = config.get('region')
 if region == "None":
+    vcf_file = str(vcf_file)
     region = vcf_file.split('/')[-1].split('.')[0]
 else:
+    region = str(region)
     region = region.split('/')[-1].split('.')[0]
 
 
