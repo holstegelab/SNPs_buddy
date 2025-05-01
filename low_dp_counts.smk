@@ -12,10 +12,9 @@ else:
 
 rule get_precentage:
     input: vcf = vcf_file,
-            bed = region
     output: "{region_name}.low_dp_counts.tsv"
     conda: "envs/snp_buddies.yaml"
-    params: bed = lambda wildcards, input: int(input.bed) if input.bed != "None" else 0
+    params: bed = int(region) if region != "None" else 0
     default_target: True
     shell:
         """
