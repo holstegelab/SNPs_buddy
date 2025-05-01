@@ -51,6 +51,13 @@ If dir_name is not there output dir name will be name of 1st samplename.
 
 snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile ~/Share/SNPs_buddy/Sample_by_samplename.smk
 
-
-
+## Check missigness of SNPs in your vcf
+To check the missigness of SNPs in your vcf file you can use the script `low_dp_counts.smk`
+0. activate conda environment `conda activate snp_buddies_env`
+Usage:
+1. `snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+`vcf` - path to the vcf file (Obligatory)
+`region` - path to the region file (Optional)
+As output you will get a tsv file. 1 SNP per line. 
+Columns: Chromosome, position, number of samples where this SNP is not covered, percantage of samples where this SNP is not covered
 
