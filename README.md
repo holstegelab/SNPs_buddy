@@ -53,11 +53,15 @@ snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} 
 
 ## Check missigness of SNPs in your vcf
 To check the missigness of SNPs in your vcf file you can use the script `low_dp_counts.smk`
-0. activate conda environment `conda activate snp_buddies_env`
+Activate conda environment `conda activate snp_buddies_env`
 Usage:
-1. `snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+`snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+
 `vcf` - path to the vcf file (Obligatory)
+
 `region` - path to the region file (Optional)
+
 As output you will get a tsv file. 1 SNP per line. 
+
 Columns: Chromosome, position, number of samples where this SNP is not covered, percantage of samples where this SNP is not covered
 
