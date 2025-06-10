@@ -20,7 +20,6 @@ In constants.py you can find path to the directory with vcf  files
 1. clone code to the directory of choice `git clone https://github.com/holstegelab/SNPs_buddy.git` or find it on Spider `/project/holstegelab/Share/SNPs_buddy`
     If you want to update - run the command `git pull` from the directory with the code
 3. install conda environment `conda env create -f envs/snp_buddies.yaml` and activate it
-4. To run this code you have to move to a directory with vcf files. (`/project/holstegelab/Share/NL_VUMC_joint_calling_splitted` for example)
 5. (PREFFERED) method is to use `snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --config gene=MyFancyGene`
 In this case you'll request nodes automatically inside the script and you won't be bothered with the amount of cores
 
