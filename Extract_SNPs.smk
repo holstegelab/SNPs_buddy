@@ -40,7 +40,8 @@ rule gather_parts:
 
 rule quality_check:
     input: pj('{gene}/{gene}.vcf')
-    output: pj('{gene}/FILTRED_{gene}.vcf')
+    output: vcf = pj('{gene}/FILTRED_{gene}.vcf'),
+            stats = pj('{gene}/FILTRED_{gene}.vcf.stats')
     conda: "envs/snp_buddies.yaml"
     benchmark: pj('{gene}/benchs/{gene}.quality.benchmark')
     resources: n = 2,
@@ -48,9 +49,9 @@ rule quality_check:
                 partition = 'normal',
                 time_min = '00:20:00'
     shell: """
-            bcftools view -Ov -o {output} --threads 2 --include 'QUAL>20 & FORMAT/DP>10' {input} 
+            bcftools view -Ov -o {output.vcf} --threads 2 --include 'QUAL>20 & FORMAT/DP>10' {input} 
             
-            bcftools stats {output} > {output}.stats
+            bcftools stats {output.vcf} > {output.vcf}.stats
             """
 
 rule calculate_missigness:

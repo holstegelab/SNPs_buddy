@@ -20,7 +20,6 @@ In constants.py you can find path to the directory with vcf  files
 1. clone code to the directory of choice `git clone https://github.com/holstegelab/SNPs_buddy.git` or find it on Spider `/project/holstegelab/Share/SNPs_buddy`
     If you want to update - run the command `git pull` from the directory with the code
 3. install conda environment `conda env create -f envs/snp_buddies.yaml` and activate it
-4. To run this code you have to move to a directory with vcf files. (`/project/holstegelab/Share/NL_VUMC_joint_calling_splitted` for example)
 5. (PREFFERED) method is to use `snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --config gene=MyFancyGene`
 In this case you'll request nodes automatically inside the script and you won't be bothered with the amount of cores
 
@@ -53,11 +52,15 @@ snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} 
 
 ## Check missigness of SNPs in your vcf
 To check the missigness of SNPs in your vcf file you can use the script `low_dp_counts.smk`
-0. activate conda environment `conda activate snp_buddies_env`
+Activate conda environment `conda activate snp_buddies_env`
 Usage:
-1. `snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+`snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+
 `vcf` - path to the vcf file (Obligatory)
+
 `region` - path to the region file (Optional)
+
 As output you will get a tsv file. 1 SNP per line. 
+
 Columns: Chromosome, position, number of samples where this SNP is not covered, percantage of samples where this SNP is not covered
 
