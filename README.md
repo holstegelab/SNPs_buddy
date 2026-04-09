@@ -64,3 +64,32 @@ As output you will get a tsv file. 1 SNP per line.
 
 Columns: Chromosome, position, number of samples where this SNP is not covered, percantage of samples where this SNP is not covered
 
+## Compare cohort AFs and get p-values
+If you want to compare allele frequencies between several cohorts and get pairwise p-values there is a script `cohort_af_pvalues.py`
+
+The script reads a filtered vcf file and cohort manifest tsv files. For each SNP ALT allele it writes cohort AF, missigness, odds ratio and Fisher exact test p-value.
+
+Usage:
+`python cohort_af_pvalues.py --vcf /path/to/file.vcf.gz --cohort Cases=/path/to/cases.tsv --cohort Controls=/path/to/controls.tsv --output /path/to/results.tsv`
+
+If your cohort files have header use `--has-header`
+
+By default script reads sample IDs from column 2 in cohort tsv files. If your sample IDs are in another column use `--sample-column N`
+
+By default script requires DP >= 30 for sample genotype to be counted. If you want another cutoff use `--min-dp 20`
+
+If you want Manhattan plots for all pairwise p-value columns use `--manhattan-prefix /path/to/plots/myplot`
+This will create png files, 1 plot per p-value column
+
+Output is a tsv file with columns:
+`chrom`, `pos`, `snp_id`, `ref`, `alt`
+
+then for each cohort:
+`AF_COHORTNAME`
+`missingness_pct_COHORTNAME`
+
+then for each pair of cohorts:
+`oddsratio_COHORT1_vs_COHORT2`
+`pvalue_COHORT1_vs_COHORT2`
+
+Only SNPs are included in output, indels are skipped.
