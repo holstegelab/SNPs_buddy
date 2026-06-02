@@ -35,6 +35,12 @@ Optional config:
 
 - `input_dir=/path/to/annotated_parts`
 
+If you want to work with the DemenTree dataset, set:
+
+```bash
+--config input_dir=/project/holstegelab/Share/DemenTree
+```
+
 Behavior:
 
 - `gene` mode keeps variants where `INFO/Gene.ensGene` or `INFO/Gene.refGene` matches the provided gene name
@@ -96,6 +102,12 @@ Optional config:
 
 - `dir_name=output_directory_name`
 - `input_dir=/path/to/annotated_parts`
+
+If you want to work with the DemenTree dataset, set:
+
+```bash
+--config input_dir=/project/holstegelab/Share/DemenTree
+```
 
 Behavior:
 
