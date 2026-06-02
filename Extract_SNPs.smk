@@ -2,34 +2,66 @@ import os
 from constants import *
 
 gene = config.get('gene')
+bed = config.get('bed')
 genotype_mode = config.get("genotype_mode", "WES")
 gvcf_caller = config.get("caller", "BOTH")
 input_dir = config.get('input_dir', '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED')
 
+
+def get_target_name(gene_name, bed_path):
+    if gene_name and bed_path:
+        raise ValueError("Provide either 'gene' or 'bed', not both.")
+    if not gene_name and not bed_path:
+        raise ValueError("Provide one of 'gene' or 'bed'.")
+
+    if bed_path:
+        bed_name = os.path.basename(str(bed_path))
+        if bed_name.endswith('.bed.gz'):
+            return bed_name[:-7]
+        if bed_name.endswith('.bed'):
+            return bed_name[:-4]
+        return os.path.splitext(bed_name)[0]
+
+    return str(gene_name)
+
+
+target_name = get_target_name(gene, bed)
+
+if bed:
+    bed = os.path.abspath(str(bed))
+    if not os.path.exists(bed):
+        raise FileNotFoundError(f"BED file not found: {bed}")
+
 rule all:
-    input: expand(pj('{gene}/FILTRED_{gene}.vcf'), gene=gene),
-              expand(pj('{gene}/FILTRED_{gene}.missigness.tsv'), gene=gene),
-              expand(pj('{gene}/FILTRED_{gene}.vcf.stats'), gene=gene)
+    input: pj(target_name, f'FILTRED_{target_name}.vcf'),
+           pj(target_name, f'FILTRED_{target_name}.missigness.tsv'),
+           pj(target_name, f'FILTRED_{target_name}.vcf.stats')
 
 
 rule extract_per_part:
     input: pj(input_dir, '{parts}.annotated.vcf.gz')
-    output: temp(ensure(pj('{gene}/{parts}_annotated.vcf.gz'), non_empty=True))
+    output: temp(pj(target_name, '{parts}_annotated.vcf.gz'))
     conda: "envs/snp_buddies.yaml"
-    benchmark: pj('{gene}/benchs/{parts}_extract.benchmark')
+    benchmark: pj(target_name, 'benchs/{parts}_extract.benchmark')
+    params: gene = gene,
+            bed = bed
     resources: n = 2,
                 mem_mb = 1000,
                 partition = 'normal',
                 time_min = '00:45:00'
     shell: """
-            bcftools view -Oz -o {output}  --exclude-uncalled --threads 2 --include 'INFO/Gene.ensGene=="{gene}" || INFO/Gene.refGene=="{gene}"'  {input}
+            if [ "{params.bed}" = "None" ]; then
+                bcftools view -Oz -o {output} --exclude-uncalled --threads 2 --include 'INFO/Gene.ensGene=="{params.gene}" || INFO/Gene.refGene=="{params.gene}"' {input}
+            else
+                bcftools view -Oz -o {output} --exclude-uncalled --threads 2 -R "{params.bed}" {input}
+            fi
             """
 
 rule gather_parts:
-    input: expand(pj('{gene}/{parts}_annotated.vcf.gz'), parts=parts, allow_missing=True)
-    output: pj('{gene}/{gene}.vcf')
+    input: expand(pj(target_name, '{parts}_annotated.vcf.gz'), parts=parts, allow_missing=True)
+    output: pj(target_name, f'{target_name}.vcf')
     conda: "envs/snp_buddies.yaml"
-    benchmark: pj('{gene}/benchs/{gene}.gather.benchmark')
+    benchmark: pj(target_name, f'benchs/{target_name}.gather.benchmark')
     resources: n = 2,
                 mem_mb = 1000,
                 partition = 'normal',
@@ -39,11 +71,11 @@ rule gather_parts:
             """
 
 rule quality_check:
-    input: pj('{gene}/{gene}.vcf')
-    output: vcf = pj('{gene}/FILTRED_{gene}.vcf'),
-            stats = pj('{gene}/FILTRED_{gene}.vcf.stats')
+    input: pj(target_name, f'{target_name}.vcf')
+    output: vcf = pj(target_name, f'FILTRED_{target_name}.vcf'),
+            stats = pj(target_name, f'FILTRED_{target_name}.vcf.stats')
     conda: "envs/snp_buddies.yaml"
-    benchmark: pj('{gene}/benchs/{gene}.quality.benchmark')
+    benchmark: pj(target_name, f'benchs/{target_name}.quality.benchmark')
     resources: n = 2,
                 mem_mb = 1000,
                 partition = 'normal',
@@ -55,8 +87,8 @@ rule quality_check:
             """
 
 rule calculate_missigness:
-    input: pj('{gene}/FILTRED_{gene}.vcf')
-    output: pj('{gene}/FILTRED_{gene}.missigness.tsv')
+    input: pj(target_name, f'FILTRED_{target_name}.vcf')
+    output: pj(target_name, f'FILTRED_{target_name}.missigness.tsv')
     conda: "envs/snp_buddies.yaml"
     resources: n = 1,
                 mem_mb = 1000,
@@ -73,4 +105,3 @@ rule calculate_missigness:
                      printf "%s\t%s\t%d\t%.2f%%\n", $1, $2, count, percent
                  }}' > {output}
         """
-

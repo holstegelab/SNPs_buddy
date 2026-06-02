@@ -1,95 +1,264 @@
 # SNPs_buddy
-Basic scripts to help with VCF files 
 
-## Extract genes of interest
-To extract genes of interest from vcf files there is the snakemake file `Extract_SNPs.smk`
+Utilities for extracting and summarizing variants from annotated VCF files.
 
-As the output of the pipeline, there are 99 files, and finding the right gene could be painful. 
+All commands below assume you are running from the repository root:
 
-So here is a small script to help you with it.
-By defautl input dir is '/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED', but you can change it in by passing `--config input_dir=MYNICEPATH` to snakemake command
+```bash
+cd /path/to/SNPs_buddy
+```
 
+## Requirements
 
-In constants.py you can find path to the directory with vcf  files 
+- `conda` or `miniconda`
+- input VCF files for the Snakemake workflows must be split into per-part files named `{part}.annotated.vcf.gz`
+- by default the Snakemake workflows read those files from `/project/holstegelab/Share/NL_VUMC_joint_calling_splitted/ANNOTATED`
 
-### Instruction
+Create the environment once:
 
+```bash
+conda env create -f envs/snp_buddies.yaml
+conda activate snp_buddies_env
+```
 
+The environment defined in [envs/snp_buddies.yaml](envs/snp_buddies.yaml) includes `bcftools`, `htslib`, `gatk4`, `pyvcf`, `python 3.11`, and `snakemake`.
 
-0. install conda or miniconda [instructions here](https://docs.anaconda.com/free/miniconda/miniconda-install/)
-1. clone code to the directory of choice `git clone https://github.com/holstegelab/SNPs_buddy.git` or find it on Spider `/project/holstegelab/Share/SNPs_buddy`
-    If you want to update - run the command `git pull` from the directory with the code
-3. install conda environment `conda env create -f envs/snp_buddies.yaml` and activate it
-5. (PREFFERED) method is to use `snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --config gene=MyFancyGene`
-In this case you'll request nodes automatically inside the script and you won't be bothered with the amount of cores
+## Extract variants by gene or BED
 
-6. (ALTernative old). You can request nodes manually. You can use `salloc` for interactive nodes or just use `srun` for example `srun -p normal -c 32 -t 12:0:0 snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 32 --config gene=MyFancyGene`
-If you are using intercative node - start snakemake script with command `snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Extract_SNPs.smk --rerun-incomplete --conda-frontend conda --use-conda -c 2 --config gene=MyFancyGene`
- After -c you have to mention amount of cores that will be used. I recommend to use all required amount of cores. 
-7. You will get a directory with a genename and some vcf-files and stat files inside
+Use [Extract_SNPs.smk](Extract_SNPs.smk).
 
+Required config:
 
-## Check samples that have a SNPs
-0. Script will ask to print the path to the vcf file. Since python doesn't work good with relative paths, you have to provide the full path to the file. To check the real path for the vcf file you have to use the command `realpath MYNICEVCF.vcf` and copy the output. Then paste it as input to the script
+- exactly one of `gene=GENE_NAME` or `bed=/path/to/regions.bed`
 
-1.  To use this script type `python Extract_samples.py`
+Optional config:
 
-2. The output will be a table in the shell. The script will ask for an output file. Type a path to the output file.
+- `input_dir=/path/to/annotated_parts`
 
-## Extract by sample_name
-To extract SNPs by sample name you can use the script `Sample_by_samplename.smk`
-usage:
-`snakemake --snakefile /project/holstegelab/Share/SNPs_buddy/Sample_by_samplename.smk --rerun-incomplete --conda-frontend conda --use-conda -c 2 --config sample_names=Sample1,Sample2,SampleN dir_name=MyFancyResults`
+Behavior:
 
-To change core numbers change `-c 2` to actual core numbers
+- `gene` mode keeps variants where `INFO/Gene.ensGene` or `INFO/Gene.refGene` matches the provided gene name
+- `bed` mode keeps variants overlapping the provided BED intervals via `bcftools view -R`
+- the output directory name is the gene name or the BED basename with `.bed` or `.bed.gz` removed
 
-use `--config sample_names` to pass all sample names that you want to insclude in output. Use comma-separated list without space.
-If there are more than 1 sample it's handy to pass a directory name for output with `--config dir_name=MyFancyResluts`
-If dir_name is not there output dir name will be name of 1st samplename.
+Local example:
 
+```bash
+snakemake -c 2 \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --use-conda \
+  --snakefile Extract_SNPs.smk \
+  --config gene=APP
+```
 
-snakemake --jobs 20 --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" --rerun-incomplete --conda-frontend conda --keep-going --use-conda --snakefile ~/Share/SNPs_buddy/Sample_by_samplename.smk
+BED example:
 
-## Check missigness of SNPs in your vcf
-To check the missigness of SNPs in your vcf file you can use the script `low_dp_counts.smk`
-Activate conda environment `conda activate snp_buddies_env`
-Usage:
-`snakemake -c 1 --snakefile ~/Share/SNPs_buddy/low_dp_counts.smk --config vcf={/path/to/vcf} region={/path/to/region}`
+```bash
+snakemake -c 2 \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --use-conda \
+  --snakefile Extract_SNPs.smk \
+  --config bed=/path/to/regions.bed
+```
 
-`vcf` - path to the vcf file (Obligatory)
+Cluster example:
 
-`region` - path to the region file (Optional)
+```bash
+snakemake --jobs 20 \
+  --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --keep-going \
+  --use-conda \
+  --snakefile Extract_SNPs.smk \
+  --config gene=APP
+```
 
-As output you will get a tsv file. 1 SNP per line. 
+Outputs for target `APP`:
 
-Columns: Chromosome, position, number of samples where this SNP is not covered, percantage of samples where this SNP is not covered
+- `APP/APP.vcf`
+- `APP/FILTRED_APP.vcf`
+- `APP/FILTRED_APP.vcf.stats`
+- `APP/FILTRED_APP.missigness.tsv`
+- `APP/benchs/`
 
-## Compare cohort AFs and get p-values
-If you want to compare allele frequencies between several cohorts and get pairwise p-values there is a script `cohort_af_pvalues.py`
+## Extract variants by sample name
 
-The script reads a filtered vcf file and cohort manifest tsv files. For each SNP ALT allele it writes cohort AF, missigness, odds ratio and Fisher exact test p-value.
+Use [Sample_by_samplename.smk](Sample_by_samplename.smk).
 
-Usage:
-`python cohort_af_pvalues.py --vcf /path/to/file.vcf.gz --cohort Cases=/path/to/cases.tsv --cohort Controls=/path/to/controls.tsv --output /path/to/results.tsv`
+Required config:
 
-If your cohort files have header use `--has-header`
+- `sample_names=Sample1,Sample2,...`
 
-By default script reads sample IDs from column 2 in cohort tsv files. If your sample IDs are in another column use `--sample-column N`
+Optional config:
 
-By default script requires DP >= 30 for sample genotype to be counted. If you want another cutoff use `--min-dp 20`
+- `dir_name=output_directory_name`
+- `input_dir=/path/to/annotated_parts`
 
-If you want Manhattan plots for all pairwise p-value columns use `--manhattan-prefix /path/to/plots/myplot`
-This will create png files, 1 plot per p-value column
+Behavior:
 
-Output is a tsv file with columns:
-`chrom`, `pos`, `snp_id`, `ref`, `alt`
+- `sample_names` is passed directly to `bcftools view -s`, so use a comma-separated list with no spaces
+- if `dir_name` is not provided, the workflow uses the first sample name before the first comma
 
-then for each cohort:
-`AF_COHORTNAME`
-`missingness_pct_COHORTNAME`
+Example:
 
-then for each pair of cohorts:
-`oddsratio_COHORT1_vs_COHORT2`
-`pvalue_COHORT1_vs_COHORT2`
+```bash
+snakemake -c 2 \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --use-conda \
+  --snakefile Sample_by_samplename.smk \
+  --config sample_names=Sample1,Sample2 dir_name=my_samples
+```
 
-Only SNPs are included in output, indels are skipped.
+Cluster example:
+
+```bash
+snakemake --jobs 20 \
+  --cluster "sbatch -n {resources.n} --mem {resources.mem_mb} -p {resources.partition} -t {resources.time_min}" \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --keep-going \
+  --use-conda \
+  --snakefile Sample_by_samplename.smk \
+  --config sample_names=Sample1,Sample2 dir_name=my_samples
+```
+
+Outputs are written under `dir_name/`, with benchmarks under `dir_name/benchs/`.
+
+## Summarize variants per sample from a VCF
+
+Use [Extract_samples.py](Extract_samples.py).
+
+Run:
+
+```bash
+python Extract_samples.py
+```
+
+The script interactively asks for:
+
+- the input VCF path
+- the first output TSV path
+- the second output TSV path
+
+Behavior:
+
+- reads all sample names from the VCF
+- keeps sample variants with genotype type `1` or `2`
+- requires `DP >= 10` and `GQ >= 20`
+- assigns an `Importance` label based on annotation fields and score thresholds in the script
+
+Outputs:
+
+- the first TSV contains `Sample`, `Chr`, `Pos`, `Ref`, `Alt`, `GT`, `AD`
+- the second TSV contains `Importance`, the same core columns, and one column for each INFO field observed in the VCF
+
+## Count low-depth calls per site
+
+Use [low_dp_counts.smk](low_dp_counts.smk).
+
+Required config:
+
+- `vcf=/path/to/file.vcf`
+
+Optional config:
+
+- `region=/path/to/regions.bed`
+
+Behavior:
+
+- without `region`, the workflow scans the whole VCF
+- with `region`, the workflow bgzips and indexes the VCF, filters to the BED intervals, then computes the same metrics on the filtered records
+- for each site, it counts samples with non-missing `DP < 10`
+
+Example:
+
+```bash
+snakemake -c 1 \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --use-conda \
+  --snakefile low_dp_counts.smk \
+  --config vcf=/path/to/file.vcf
+```
+
+Example with BED regions:
+
+```bash
+snakemake -c 1 \
+  --rerun-incomplete \
+  --conda-frontend conda \
+  --use-conda \
+  --snakefile low_dp_counts.smk \
+  --config vcf=/path/to/file.vcf region=/path/to/regions.bed
+```
+
+Output naming:
+
+- without `region`: `<vcf_basename>.low_dp_counts.tsv`
+- with `region`: `<region_basename>.low_dp_counts.tsv`
+
+Output columns:
+
+- chromosome
+- position
+- number of samples with `DP < 10`
+- percentage of samples with `DP < 10`
+
+## Compare cohort allele frequencies and p-values
+
+Use [cohort_af_pvalues.py](cohort_af_pvalues.py).
+
+Required arguments:
+
+- `--vcf /path/to/file.vcf` or `--vcf /path/to/file.vcf.gz`
+- one or more `--cohort NAME=/path/to/cohort.tsv`
+- `--output /path/to/results.tsv`
+
+Optional arguments:
+
+- `--sample-column N`
+- `--has-header`
+- `--missing-value VALUE`
+- `--min-dp N`
+- `--manhattan-prefix /path/to/plot_prefix`
+- `--genome-wide-threshold FLOAT`
+
+Input expectations:
+
+- cohort files must be tab-delimited
+- sample IDs are read from the selected column
+- `--sample-column` is 1-based and defaults to `2`
+- duplicate sample IDs inside a cohort file are ignored with a warning
+
+Example:
+
+```bash
+python cohort_af_pvalues.py \
+  --vcf /path/to/file.vcf.gz \
+  --cohort Cases=/path/to/cases.tsv \
+  --cohort Controls=/path/to/controls.tsv \
+  --output /path/to/results.tsv
+```
+
+Behavior:
+
+- writes one row per SNP ALT allele
+- skips indels
+- treats sample genotypes with `DP < 30` as missing by default
+- if `--manhattan-prefix` is provided, writes one PNG Manhattan plot per pairwise p-value column
+
+Output columns:
+
+- `chrom`
+- `pos`
+- `snp_id`
+- `ref`
+- `alt`
+- `AF_COHORTNAME` for each cohort
+- `missingness_pct_COHORTNAME` for each cohort
+- `oddsratio_COHORT1_vs_COHORT2` for each cohort pair
+- `pvalue_COHORT1_vs_COHORT2` for each cohort pair
